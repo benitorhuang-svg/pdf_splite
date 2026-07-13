@@ -1,0 +1,28 @@
+.page-keyboard-actions {
+  position: absolute;
+  inset: auto 3px 3px 3px;
+  z-index: 2;
+  display: flex;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity .15s ease;
+}
+
+.board-page-card:hover .page-keyboard-actions,
+.board-page-card:focus-within .page-keyboard-actions { opacity: 1; }
+
+.page-keyboard-actions button {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.page-keyboard-actions button:disabled {
+  opacity: .35;
+  cursor: not-allowed;
+}

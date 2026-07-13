@@ -1,0 +1,143 @@
+/* Flattened Inline Assist Bar */
+.range-assist-flat-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 6px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: var(--surface-hover);
+  border: 1px dashed var(--line);
+}
+
+.assist-flat-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.assist-flat-group label {
+  font-size: 10px;
+  font-weight: 750;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.assist-flat-select {
+  height: 26px;
+  padding: 0 6px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 10.5px;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.assist-flat-select:focus {
+  border-color: var(--theme-solid);
+}
+
+.assist-flat-range {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.assist-flat-number-input {
+  width: 44px;
+  height: 26px;
+  text-align: center;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 10.5px;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.assist-flat-number-input:focus {
+  border-color: var(--theme-solid);
+}
+
+.assist-flat-number-input::-webkit-outer-spin-button,
+.assist-flat-number-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.assist-flat-separator,
+.assist-flat-unit {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.assist-flat-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.assist-flat-btn {
+  height: 24px;
+  padding: 0 8px;
+  border: none;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 750;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s, opacity 0.15s, border-color 0.15s;
+}
+
+.assist-flat-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.assist-flat-btn.primary {
+  background: var(--theme-solid);
+  color: #ffffff;
+}
+
+.assist-flat-btn.primary:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.assist-flat-btn.secondary {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  color: var(--text);
+}
+
+.assist-flat-btn.secondary:hover:not(:disabled) {
+  background: var(--surface-hover);
+}
+
+.assist-flat-btn.danger {
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  color: #dc2626;
+}
+
+.dark .assist-flat-btn.danger {
+  background: #451a1a;
+  border-color: #7f1d1d;
+  color: #fca5a5;
+}
+
+.assist-flat-btn.danger:hover:not(:disabled) {
+  background: #fee2e2;
+}
+
+.dark .assist-flat-btn.danger:hover:not(:disabled) {
+  background: #5c1e1e;
+}
