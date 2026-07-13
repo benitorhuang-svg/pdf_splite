@@ -5,19 +5,6 @@
   font-synthesis: none;
 }
 
-@media (min-width: 1024px) {
-  :root { zoom: 1.25; }
-}
-@media (min-width: 1280px) {
-  :root { zoom: 1.45; }
-}
-@media (min-width: 1536px) {
-  :root { zoom: 1.65; }
-}
-@media (min-width: 1920px) {
-  :root { zoom: 1.85; }
-}
-
 * { box-sizing: border-box; }
 body { margin: 0; min-width: 320px; min-height: 100vh; overflow: hidden; }
 button, input { font: inherit; }
