@@ -5,14 +5,17 @@
   font-synthesis: none;
 }
 
-@media (min-width: 1280px) {
-  :root { zoom: 1.15; }
-}
-@media (min-width: 1536px) {
+@media (min-width: 1024px) {
   :root { zoom: 1.25; }
 }
+@media (min-width: 1280px) {
+  :root { zoom: 1.45; }
+}
+@media (min-width: 1536px) {
+  :root { zoom: 1.65; }
+}
 @media (min-width: 1920px) {
-  :root { zoom: 1.4; }
+  :root { zoom: 1.85; }
 }
 
 * { box-sizing: border-box; }
