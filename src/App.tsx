@@ -109,7 +109,7 @@ export default function App() {
       {state.warning && <div className="workload-warning" role="status">{state.warning}</div>}
 
       {activeTab === 'import' ? (
-        <main className="import-workspace">
+        <main className="import-workspace" tabIndex={0}>
           <section className="import-card import-card-batch">
             <div className="import-card-main">
             <div className="import-card-heading">
