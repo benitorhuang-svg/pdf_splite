@@ -1,9 +1,9 @@
 .page-keyboard-actions {
   position: absolute;
-  inset: auto 3px 3px 3px;
+  inset: auto calc(3px * var(--ui-scale, 1)) calc(3px * var(--ui-scale, 1)) calc(3px * var(--ui-scale, 1));
   z-index: 2;
   display: flex;
-  gap: 2px;
+  gap: calc(2px * var(--ui-scale, 1));
   opacity: 0;
   transition: opacity .15s ease;
 }
@@ -12,11 +12,11 @@
 .board-page-card:focus-within .page-keyboard-actions { opacity: 1; }
 
 .page-keyboard-actions button {
-  width: 22px;
-  height: 22px;
+  width: calc(22px * var(--ui-scale, 1));
+  height: calc(22px * var(--ui-scale, 1));
   padding: 0;
   border: 1px solid var(--line);
-  border-radius: 4px;
+  border-radius: calc(4px * var(--ui-scale, 1));
   background: var(--surface);
   color: var(--text);
   cursor: pointer;

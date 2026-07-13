@@ -3,10 +3,10 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 6px;
-  padding: 6px 10px;
-  border-radius: 8px;
+  gap: calc(12px * var(--ui-scale, 1));
+  margin-bottom: calc(6px * var(--ui-scale, 1));
+  padding: calc(6px * var(--ui-scale, 1)) calc(10px * var(--ui-scale, 1));
+  border-radius: calc(8px * var(--ui-scale, 1));
   background: var(--surface-hover);
   border: 1px dashed var(--line);
 }
@@ -14,24 +14,24 @@
 .assist-flat-group {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: calc(6px * var(--ui-scale, 1));
 }
 
 .assist-flat-group label {
-  font-size: 10px;
+  font-size: calc(10px * var(--ui-scale, 1));
   font-weight: 750;
   color: var(--muted);
   white-space: nowrap;
 }
 
 .assist-flat-select {
-  height: 26px;
-  padding: 0 6px;
+  height: calc(26px * var(--ui-scale, 1));
+  padding: 0 calc(6px * var(--ui-scale, 1));
   border: 1px solid var(--line);
-  border-radius: 6px;
+  border-radius: calc(6px * var(--ui-scale, 1));
   background: var(--surface);
   color: var(--text);
-  font-size: 10.5px;
+  font-size: calc(10.5px * var(--ui-scale, 1));
   outline: none;
   cursor: pointer;
   transition: border-color 0.15s ease;
@@ -44,18 +44,18 @@
 .assist-flat-range {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: calc(4px * var(--ui-scale, 1));
 }
 
 .assist-flat-number-input {
-  width: 44px;
-  height: 26px;
+  width: calc(44px * var(--ui-scale, 1));
+  height: calc(26px * var(--ui-scale, 1));
   text-align: center;
   border: 1px solid var(--line);
-  border-radius: 6px;
+  border-radius: calc(6px * var(--ui-scale, 1));
   background: var(--surface);
   color: var(--text);
-  font-size: 10.5px;
+  font-size: calc(10.5px * var(--ui-scale, 1));
   outline: none;
   transition: border-color 0.15s ease;
 }
@@ -72,7 +72,7 @@
 
 .assist-flat-separator,
 .assist-flat-unit {
-  font-size: 10.5px;
+  font-size: calc(10.5px * var(--ui-scale, 1));
   font-weight: 700;
   color: var(--muted);
 }
@@ -80,16 +80,16 @@
 .assist-flat-actions {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: calc(6px * var(--ui-scale, 1));
   margin-left: auto;
 }
 
 .assist-flat-btn {
-  height: 24px;
-  padding: 0 8px;
+  height: calc(24px * var(--ui-scale, 1));
+  padding: 0 calc(8px * var(--ui-scale, 1));
   border: none;
-  border-radius: 6px;
-  font-size: 10px;
+  border-radius: calc(6px * var(--ui-scale, 1));
+  font-size: calc(10px * var(--ui-scale, 1));
   font-weight: 750;
   cursor: pointer;
   display: inline-flex;

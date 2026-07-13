@@ -3,32 +3,32 @@
   min-height: 0;
   overflow-y: auto;
   scrollbar-gutter: stable;
-  padding: 12px 14px 16px;
+  padding: calc(12px * var(--ui-scale, 1)) calc(14px * var(--ui-scale, 1)) calc(16px * var(--ui-scale, 1));
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: calc(10px * var(--ui-scale, 1));
   background: color-mix(in srgb, var(--surface) 96%, var(--line));
 }
 .source-accordion {
   flex: none;
   scroll-margin-top: 0;
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: calc(12px * var(--ui-scale, 1));
   background: var(--surface);
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(20, 34, 56, .05);
+  box-shadow: 0 1px calc(3px * var(--ui-scale, 1)) rgba(20, 34, 56, .05);
 }
 .source-accordion.is-expanded {
   border-color: color-mix(in srgb, var(--primary) 32%, var(--line));
-  box-shadow: 0 5px 16px rgba(20, 34, 56, .08);
+  box-shadow: 0 calc(5px * var(--ui-scale, 1)) calc(16px * var(--ui-scale, 1)) rgba(20, 34, 56, .08);
 }
 .source-accordion-trigger {
   width: 100%;
-  min-height: 62px;
-  padding: 10px 14px;
+  min-height: calc(62px * var(--ui-scale, 1));
+  padding: calc(10px * var(--ui-scale, 1)) calc(14px * var(--ui-scale, 1));
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: calc(10px * var(--ui-scale, 1));
   border: 0;
   background: transparent;
   color: inherit;
@@ -40,21 +40,21 @@
   background: color-mix(in srgb, var(--primary) 7%, var(--surface));
 }
 .source-accordion-copy { min-width: 0; flex: 1; }
-.source-accordion-copy strong { display: block; overflow: hidden; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
-.source-accordion-copy small { display: block; margin-top: 4px; color: var(--muted); font-size: 10px; }
+.source-accordion-copy strong { display: block; overflow: hidden; font-size: calc(12px * var(--ui-scale, 1)); text-overflow: ellipsis; white-space: nowrap; }
+.source-accordion-copy small { display: block; margin-top: calc(4px * var(--ui-scale, 1)); color: var(--muted); font-size: calc(10px * var(--ui-scale, 1)); }
 .source-accordion-copy small b { color: var(--source-color, var(--primary)); }
-.source-accordion-chevron { flex: none; color: var(--muted); font-size: 18px; transition: transform .15s; }
+.source-accordion-chevron { flex: none; color: var(--muted); font-size: calc(18px * var(--ui-scale, 1)); transition: transform .15s; }
 .source-accordion-trigger[aria-expanded="true"] .source-accordion-chevron { transform: rotate(180deg); }
 .source-pages-grid {
-  height: calc(100dvh - 275px);
-  max-height: calc(100dvh - 275px);
-  min-height: 260px;
-  padding: 18px 14px 110px;
+  height: calc(100dvh - calc(275px * var(--ui-scale, 1)));
+  max-height: calc(100dvh - calc(275px * var(--ui-scale, 1)));
+  min-height: calc(260px * var(--ui-scale, 1));
+  padding: calc(18px * var(--ui-scale, 1)) calc(14px * var(--ui-scale, 1)) calc(110px * var(--ui-scale, 1));
   overflow-y: auto;
   scrollbar-gutter: stable;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(var(--pool-thumbnail-width, 110px), 1fr));
-  gap: 18px 14px;
+  grid-template-columns: repeat(auto-fill, minmax(var(--pool-thumbnail-width, calc(110px * var(--ui-scale, 1))), 1fr));
+  gap: calc(18px * var(--ui-scale, 1)) calc(14px * var(--ui-scale, 1));
   justify-items: center;
   align-content: start;
   background: color-mix(in srgb, var(--surface) 97%, var(--line));
@@ -69,8 +69,8 @@
 }
 .pool-item.assigned {
   opacity: 1;
-  padding: 6px;
-  border-radius: 9px;
+  padding: calc(6px * var(--ui-scale, 1));
+  border-radius: calc(9px * var(--ui-scale, 1));
   background: var(--theme-bg);
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--theme-solid) 22%, var(--line));
 }
@@ -86,23 +86,23 @@
   transform: scale(0.96);
 }
 .pool-thumbnail-wrapper {
-  width: var(--pool-thumbnail-width, 110px);
+  width: var(--pool-thumbnail-width, calc(110px * var(--ui-scale, 1)));
   aspect-ratio: 0.707;
   background: white;
   border: 1px solid var(--line);
-  border-radius: 5px;
-  padding: 2px;
+  border-radius: calc(5px * var(--ui-scale, 1));
+  padding: calc(2px * var(--ui-scale, 1));
   overflow: hidden;
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  box-shadow: 0 1px calc(3px * var(--ui-scale, 1)) rgba(0,0,0,0.04);
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 .pool-item:hover .pool-thumbnail-wrapper {
   border-color: var(--blue);
-  box-shadow: 0 2px 6px rgba(18, 104, 232, 0.12);
+  box-shadow: 0 calc(2px * var(--ui-scale, 1)) calc(6px * var(--ui-scale, 1)) rgba(18, 104, 232, 0.12);
 }
 .pool-thumbnail-wrapper img {
   width: 100%;
@@ -111,29 +111,29 @@
 }
 .page-number-badge {
   position: absolute;
-  bottom: 3px;
-  left: 3px;
+  bottom: calc(3px * var(--ui-scale, 1));
+  left: calc(3px * var(--ui-scale, 1));
   background: var(--source-color, rgba(0,0,0,0.6));
   color: white;
-  font-size: 9px;
+  font-size: calc(9px * var(--ui-scale, 1));
   font-weight: 800;
-  padding: 1px 4px;
-  border-radius: 3px;
+  padding: 1px calc(4px * var(--ui-scale, 1));
+  border-radius: calc(3px * var(--ui-scale, 1));
 }
 .status-dot {
   position: absolute;
   top: -4px;
   right: -4px;
-  width: 16px;
-  height: 16px;
+  width: calc(16px * var(--ui-scale, 1));
+  height: calc(16px * var(--ui-scale, 1));
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 9px;
+  font-size: calc(9px * var(--ui-scale, 1));
   font-weight: 900;
   color: white;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  box-shadow: 0 1px calc(2px * var(--ui-scale, 1)) rgba(0,0,0,0.1);
 }
 .status-dot.assigned {
   background: var(--primary);
@@ -144,7 +144,7 @@
 }
 @keyframes pulse-alert {
   0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
-  70% { box-shadow: 0 0 0 5px rgba(245, 158, 11, 0); }
+  70% { box-shadow: 0 0 0 calc(5px * var(--ui-scale, 1)) rgba(245, 158, 11, 0); }
   100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
 }
 
@@ -152,12 +152,12 @@
 .parts-board {
   min-height: 0;
   height: 100%;
-  padding: 24px;
+  padding: calc(24px * var(--ui-scale, 1));
   overflow-y: auto;
   background: color-mix(in srgb, var(--surface) 97%, var(--line));
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: calc(20px * var(--ui-scale, 1));
 }
 .board-header {
   display: flex;
@@ -165,20 +165,20 @@
   justify-content: space-between;
 }
 .board-title h2 {
-  font-size: 18px;
-  margin: 0 0 4px;
+  font-size: calc(18px * var(--ui-scale, 1));
+  margin: 0 0 calc(4px * var(--ui-scale, 1));
   font-weight: 800;
   white-space: nowrap;
 }
 .board-title p {
   margin: 0;
-  font-size: 12px;
+  font-size: calc(12px * var(--ui-scale, 1));
   color: var(--muted);
 }
 .add-part-btn {
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-size: 13px;
+  padding: calc(8px * var(--ui-scale, 1)) calc(16px * var(--ui-scale, 1));
+  border-radius: calc(8px * var(--ui-scale, 1));
+  font-size: calc(13px * var(--ui-scale, 1));
   font-weight: 700;
   border: 0;
   cursor: pointer;
@@ -186,40 +186,40 @@
 .parts-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: calc(16px * var(--ui-scale, 1));
 }
 .part-container {
   background: var(--theme-bg);
   border: 1px solid color-mix(in srgb, var(--theme-solid) 16%, var(--line));
-  border-radius: 12px;
-  padding: 16px;
+  border-radius: calc(12px * var(--ui-scale, 1));
+  padding: calc(16px * var(--ui-scale, 1));
   transition: all 0.2s ease;
 }
 .part-container.drag-over {
   border-color: var(--theme-solid) !important;
   background: var(--theme-bg-hover) !important;
-  box-shadow: 0 0 0 3px var(--theme-focus) !important;
+  box-shadow: 0 0 0 calc(3px * var(--ui-scale, 1)) var(--theme-focus) !important;
 }
 .part-container-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
-  margin-bottom: 14px;
+  gap: calc(8px * var(--ui-scale, 1));
+  margin-bottom: calc(14px * var(--ui-scale, 1));
 }
 .download-part-btn {
   flex: none;
   margin-left: auto;
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  height: 30px;
-  padding: 0 10px;
+  gap: calc(5px * var(--ui-scale, 1));
+  height: calc(30px * var(--ui-scale, 1));
+  padding: 0 calc(10px * var(--ui-scale, 1));
   border: 1px solid color-mix(in srgb, var(--theme-solid) 40%, var(--line));
-  border-radius: 7px;
+  border-radius: calc(7px * var(--ui-scale, 1));
   background: var(--surface);
   color: var(--theme-solid);
-  font-size: 11px;
+  font-size: calc(11px * var(--ui-scale, 1));
   font-weight: 800;
   white-space: nowrap;
   cursor: pointer;
@@ -233,8 +233,8 @@
   cursor: not-allowed;
 }
 .download-part-btn svg {
-  width: 14px;
-  height: 14px;
+  width: calc(14px * var(--ui-scale, 1));
+  height: calc(14px * var(--ui-scale, 1));
 }
 
 .part-info {
@@ -243,39 +243,39 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 10px;
+  gap: calc(10px * var(--ui-scale, 1));
 }
 .part-badge {
   flex: none;
   background: var(--theme-solid);
   color: white;
-  font-size: 11px;
+  font-size: calc(11px * var(--ui-scale, 1));
   font-weight: 800;
-  padding: 3px 8px;
-  border-radius: 6px;
+  padding: calc(3px * var(--ui-scale, 1)) calc(8px * var(--ui-scale, 1));
+  border-radius: calc(6px * var(--ui-scale, 1));
 }
 .part-pages-summary {
-  font-size: 12px;
+  font-size: calc(12px * var(--ui-scale, 1));
   font-weight: 600;
   color: var(--muted);
 }
 .part-pages-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-  min-height: 80px;
-  padding: 6px;
+  gap: calc(12px * var(--ui-scale, 1));
+  min-height: calc(80px * var(--ui-scale, 1));
+  padding: calc(6px * var(--ui-scale, 1));
   align-items: center;
 }
 .part-empty-hint {
   width: 100%;
-  min-height: 68px;
+  min-height: calc(68px * var(--ui-scale, 1));
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--muted);
-  font-size: 13px;
+  font-size: calc(13px * var(--ui-scale, 1));
   font-weight: 600;
-  border: 2px dashed color-mix(in srgb, var(--theme-solid) 20%, var(--line));
-  border-radius: 8px;
+  border: calc(2px * var(--ui-scale, 1)) dashed color-mix(in srgb, var(--theme-solid) 20%, var(--line));
+  border-radius: calc(8px * var(--ui-scale, 1));
 }
