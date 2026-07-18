@@ -6,19 +6,6 @@
   --ui-scale: 1;
 }
 
-@media (min-width: 1024px) {
-  :root { --ui-scale: 1.25; }
-}
-@media (min-width: 1280px) {
-  :root { --ui-scale: 1.45; }
-}
-@media (min-width: 1536px) {
-  :root { --ui-scale: 1.65; }
-}
-@media (min-width: 1920px) {
-  :root { --ui-scale: 1.85; }
-}
-
 * { box-sizing: border-box; }
 body { margin: 0; min-width: calc(320px * var(--ui-scale, 1)); min-height: 100vh; overflow: hidden; }
 button, input { font: inherit; }
