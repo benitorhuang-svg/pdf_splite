@@ -11,9 +11,9 @@ test.describe('PWA viewport parity', () => {
       titleSize: getComputedStyle(document.querySelector('h1')).fontSize,
     }))
 
-    expect(metrics.uiScale).toBe('1')
+    expect(metrics.uiScale).toBe('1.25')
     expect(metrics.importLayout).toBe('block')
-    expect(metrics.titleSize).toBe('20px')
+    expect(metrics.titleSize).toBe('25px')
   })
 
   test('keeps the same design scale on a wide desktop viewport', async ({ page }) => {
@@ -23,6 +23,6 @@ test.describe('PWA viewport parity', () => {
     const uiScale = await page.evaluate(() =>
       getComputedStyle(document.documentElement).getPropertyValue('--ui-scale').trim())
 
-    expect(uiScale).toBe('1')
+    expect(uiScale).toBe('1.25')
   })
 })

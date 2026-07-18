@@ -3,7 +3,7 @@
   color: #142238;
   background: #f7f9fb;
   font-synthesis: none;
-  --ui-scale: 1;
+  --ui-scale: 1.25;
 }
 
 * { box-sizing: border-box; }
