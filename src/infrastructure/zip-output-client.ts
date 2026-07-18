@@ -1,15 +1,15 @@
 import type { ZipInputFile } from './zip-output-core'
 
 type WorkerResponse =
-  | { readonly type: 'complete', readonly buffer: ArrayBuffer }
+  | { readonly type: 'complete', readonly blob: Blob }
   | { readonly type: 'error', readonly message: string }
 
-const runWorker = (files: readonly ZipInputFile[]): Promise<Uint8Array> => new Promise((resolve, reject) => {
+const runWorker = (files: readonly ZipInputFile[]): Promise<Blob> => new Promise((resolve, reject) => {
   const worker = new Worker(new URL('../workers/zip-output.worker.ts', import.meta.url), { type: 'module' })
   worker.onmessage = (event: MessageEvent<WorkerResponse>) => {
     worker.terminate()
     if (event.data.type === 'error') reject(new Error(event.data.message))
-    else resolve(new Uint8Array(event.data.buffer))
+    else resolve(event.data.blob)
   }
   worker.onerror = (event) => {
     worker.terminate()
@@ -19,10 +19,10 @@ const runWorker = (files: readonly ZipInputFile[]): Promise<Uint8Array> => new P
   worker.postMessage({ files: payload }, payload.map((file) => file.buffer))
 })
 
-export const generateZipBytesInBackground = async (files: readonly ZipInputFile[]): Promise<Uint8Array> => {
+export const generateZipBlobInBackground = async (files: readonly ZipInputFile[]): Promise<Blob> => {
   if (typeof Worker === 'undefined') {
-    const { generateZipBytes } = await import('./zip-output-core')
-    return generateZipBytes(files)
+    const { generateZipBlob } = await import('./zip-output-core')
+    return generateZipBlob(files)
   }
   return runWorker(files)
 }

@@ -73,10 +73,14 @@ export default function App() {
     if (!confirmed) return
     setDownloading(true)
     try {
-      const output = await workspace.execute(naming.template)
+      const output = state.files.length === state.plan.length && generatedTemplate.current === naming.template
+        ? state.files
+        : await workspace.execute(naming.template)
       if (output && output.length > 0) {
         generatedTemplate.current = naming.template
         await downloadZip(output, state.file?.name ?? '')
+        workspace.clearGeneratedOutputs()
+        generatedTemplate.current = null
       }
     } finally {
       setDownloading(false)
@@ -86,11 +90,9 @@ export default function App() {
   const handleDownloadPart = async (partIndex: number) => {
     setDownloading(true)
     try {
-      const output = state.files.length === state.plan.length && generatedTemplate.current === naming.template
-        ? state.files
-        : await workspace.execute(naming.template)
-      if (output) generatedTemplate.current = naming.template
-      const selected = output?.[partIndex]
+      const selected = state.files.length === state.plan.length && generatedTemplate.current === naming.template
+        ? state.files[partIndex]
+        : await workspace.executePart(partIndex, naming.template)
       if (selected) downloadPdf(selected)
     } finally {
       setDownloading(false)

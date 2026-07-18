@@ -47,6 +47,18 @@ test('imports a PDF and reaches the split workspace', async ({ page }) => {
   await expect(page.getByText(/固定頁數/).first()).toBeVisible()
 })
 
+test('merges multiple PDFs in import order', async ({ page }) => {
+  await page.goto('/')
+  await page.locator('input[type="file"]').first().setInputFiles([
+    { name: 'first.pdf', mimeType: 'application/pdf', buffer: await createPdf(1) },
+    { name: 'second.pdf', mimeType: 'application/pdf', buffer: await createPdf(2) },
+  ])
+  await expect(page.getByText('first.pdf', { exact: true })).toBeVisible()
+  await expect(page.getByText('second.pdf', { exact: true })).toBeVisible()
+  await expect(page.getByText('共 1 頁', { exact: false })).toBeVisible()
+  await expect(page.getByText('共 2 頁', { exact: false })).toBeVisible()
+})
+
 test('rejects an invalid PDF before parsing', async ({ page }) => {
   await page.goto('/')
   await page.locator('input[type="file"]').first().setInputFiles({
@@ -57,7 +69,8 @@ test('rejects an invalid PDF before parsing', async ({ page }) => {
   await expect(page.getByRole('alert')).toContainText('沒有有效的 PDF 標頭')
 })
 
-test('downloads a valid ZIP and works offline after installation', async ({ page, context }) => {
+test('downloads a valid ZIP and works offline after installation', async ({ page, context, browserName }) => {
+  test.skip(browserName !== 'chromium', 'Service Worker offline coverage runs on Chromium.')
   await importPdfAndOpenWorkspace(page)
   page.once('dialog', (dialog) => dialog.accept())
   const downloadPromise = page.waitForEvent('download')
@@ -75,5 +88,22 @@ test('downloads a valid ZIP and works offline after installation', async ({ page
   await context.setOffline(true)
   await page.reload()
   await expect(page.getByRole('heading', { name: 'PDF 拆分工具' })).toBeVisible()
+  await context.setOffline(false)
+})
+
+test('processes a PDF after the PWA is installed offline', async ({ page, context, browserName }) => {
+  test.skip(browserName !== 'chromium', 'Service Worker offline coverage runs on Chromium.')
+  await page.goto('/')
+  await page.evaluate(() => navigator.serviceWorker.ready)
+  await page.reload()
+  await page.evaluate(() => navigator.serviceWorker.ready)
+  await context.setOffline(true)
+  await page.locator('input[type="file"]').first().setInputFiles({
+    name: 'offline.pdf',
+    mimeType: 'application/pdf',
+    buffer: await createPdf(2),
+  })
+  await expect(page.getByText('offline.pdf', { exact: true })).toBeVisible()
+  await expect(page.getByText('共 2 頁', { exact: false })).toBeVisible()
   await context.setOffline(false)
 })

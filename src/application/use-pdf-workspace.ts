@@ -106,7 +106,7 @@ export const usePdfWorkspace = () => {
     setWarning('')
     setFiles([])
     try {
-      const nextLoaded = await loadPdfFiles(nextFiles)
+      const nextLoaded = await loadPdfFiles(nextFiles, () => version !== workspaceVersion.current)
       if (version !== workspaceVersion.current) {
         nextLoaded.preview.cleanup()
         return
@@ -203,6 +203,7 @@ export const usePdfWorkspace = () => {
     setStatus('processing')
     setExportProgress(0)
     setError('')
+    setFiles([])
     try {
       validateSplitPlan(plan, currentLoaded.pageCount)
       const output = await splitPdf(
@@ -222,6 +223,38 @@ export const usePdfWorkspace = () => {
     }
   }
 
+  const executePart = async (partIndex: number, template: string): Promise<GeneratedFile | null> => {
+    const currentLoaded = loadedRef.current
+    if (!currentLoaded || !file || plan.length === 0) return null
+    const version = workspaceVersion.current
+    setStatus('processing')
+    setExportProgress(0)
+    setError('')
+    setFiles([])
+    try {
+      validateSplitPlan(plan, currentLoaded.pageCount)
+      const output = await splitPdf(
+        currentLoaded.bytes, plan, file.name, template,
+        (value) => { if (version === workspaceVersion.current) setExportProgress(value) },
+        () => version !== workspaceVersion.current,
+        partIndex,
+      )
+      if (version !== workspaceVersion.current) return null
+      setStatus('completed')
+      return output[0] ?? null
+    } catch (cause) {
+      if (version !== workspaceVersion.current) return null
+      setStatus('failed')
+      setError(errorMessage(cause, 'PDF 拆分失敗。'))
+      return null
+    }
+  }
+
+  const clearGeneratedOutputs = (): void => {
+    setFiles([])
+    setExportProgress(0)
+  }
+
   return {
     state: {
       file, loaded, thumbnails: thumbnails.thumbnails, rule, plan,
@@ -229,7 +262,7 @@ export const usePdfWorkspace = () => {
     },
     importFile: (nextFile: File) => importFiles([nextFile]),
     importFiles, updateMode, updateFixedCount, requestThumbnail: thumbnails.requestThumbnail,
-    execute, clear, movePage, removePage, clearPlan, reorderPageInPart, addEmptyPart, deletePart,
+    execute, executePart, clearGeneratedOutputs, clear, movePage, removePage, clearPlan, reorderPageInPart, addEmptyPart, deletePart,
     setPartPages,
   }
 }

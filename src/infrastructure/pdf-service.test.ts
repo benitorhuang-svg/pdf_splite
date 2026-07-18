@@ -36,6 +36,19 @@ describe('PDF 輸出整合', () => {
     expect(Object.keys(zip.files).sort()).toEqual(['same.pdf', 'same_2.pdf'])
   })
 
+  it('單一分件下載只產生指定分件', async () => {
+    const source = await createPdf(3)
+    const pages = createSingleSourcePages(3)
+    const output = await splitPdf(source, [
+      { index: 1, pages: [pages[0]], startPage: 1, endPage: 1 },
+      { index: 2, pages: [pages[1]], startPage: 2, endPage: 2 },
+      { index: 3, pages: [pages[2]], startPage: 3, endPage: 3 },
+    ], 'sample.pdf', '{originalName}_{partNumber}', () => undefined, () => false, 1)
+
+    expect(output).toHaveLength(1)
+    expect(output[0].name).toBe('sample_02.pdf')
+  })
+
   it('輸出時套用頁面旋轉', async () => {
     const source = await createPdf(1)
     const [page] = createSingleSourcePages(1)

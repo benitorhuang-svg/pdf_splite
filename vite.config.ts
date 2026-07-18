@@ -1,31 +1,7 @@
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vitest/config'
 import { VitePWA } from 'vite-plugin-pwa'
-import type { Plugin } from 'vite'
-import { sites } from './build/sites-vite-plugin'
-
-const workerConfig = {
-  main: './worker/index.ts',
-  compatibility_date: '2026-07-13',
-  compatibility_flags: ['nodejs_compat'],
-  assets: {
-    binding: 'ASSETS',
-    not_found_handling: 'single-page-application' as const,
-  },
-}
-type ViteEnvironment = Parameters<NonNullable<Plugin['applyToEnvironment']>>[0]
-
-export default defineConfig(async () => {
-  process.env.WRANGLER_WRITE_LOGS ??= 'false'
-  process.env.WRANGLER_LOG_PATH ??= '.wrangler/logs'
-  process.env.MINIFLARE_REGISTRY_PATH ??= '.wrangler/registry'
-  const { cloudflare } = await import('@cloudflare/vite-plugin')
-  const hostingPlugins = process.env.VITEST
-    ? []
-    : [sites(), cloudflare({
-        viteEnvironment: { name: 'server' },
-        config: workerConfig,
-      })]
+export default defineConfig(() => {
   const pwaPlugins = VitePWA({
     registerType: 'prompt',
     includeAssets: ['favicon.svg'],
@@ -45,13 +21,11 @@ export default defineConfig(async () => {
       ],
     },
     workbox: {
-      globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
+      globPatterns: ['**/*.{js,mjs,css,html,svg,png,woff2}'],
+      maximumFileSizeToCacheInBytes: 2 * 1024 * 1024,
       cleanupOutdatedCaches: true,
     },
-  }).map((plugin) => ({
-    ...plugin,
-    applyToEnvironment: (environment: ViteEnvironment) => environment.name === 'client',
-  }))
+  })
 
   return {
     base: './',
@@ -60,7 +34,6 @@ export default defineConfig(async () => {
     plugins: [
       react(),
       ...pwaPlugins,
-      ...hostingPlugins,
     ],
     test: {
       environment: 'jsdom',

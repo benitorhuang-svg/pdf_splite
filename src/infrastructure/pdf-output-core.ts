@@ -21,20 +21,22 @@ export const generatePdfParts = async (
   const source = await PDFDocument.load(request.sourceBytes)
   validateSplitPlan(request.parts, source.getPageCount())
   const result: PdfOutputResult[] = []
+  const totalPages = request.parts.reduce((total, part) => total + part.pages.length, 0)
+  let completedPages = 0
   for (let index = 0; index < request.parts.length; index += 1) {
     if (isCancelled()) throw new DOMException('工作已取消。', 'AbortError')
     const output = await PDFDocument.create()
-    const copiedPages = await output.copyPages(
-      source,
-      request.parts[index].pages.map((page) => page.documentPageNumber - 1),
-    )
-    copiedPages.forEach((page, pageIndex) => {
-      const rotation = request.parts[index].pages[pageIndex].rotation
+    const partPages = request.parts[index].pages
+    for (let pageIndex = 0; pageIndex < partPages.length; pageIndex += 1) {
+      if (isCancelled()) throw new DOMException('工作已取消。', 'AbortError')
+      const [page] = await output.copyPages(source, [partPages[pageIndex].documentPageNumber - 1])
+      const rotation = partPages[pageIndex].rotation
       if (rotation) page.setRotation(degrees((page.getRotation().angle + rotation) % 360))
       output.addPage(page)
-    })
+      completedPages += 1
+      onProgress(Math.round((completedPages / totalPages) * 100))
+    }
     result.push({ name: request.names[index], bytes: await output.save() })
-    onProgress(Math.round(((index + 1) / request.parts.length) * 100))
   }
   return result
 }

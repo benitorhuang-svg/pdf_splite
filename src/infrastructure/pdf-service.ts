@@ -2,8 +2,9 @@ import type { PDFDocumentProxy } from 'pdfjs-dist'
 import type { OutputPart } from '@/domain/split-plan'
 import { createUniqueOutputNames } from '@/domain/split-plan'
 import { validatePdfPageCount, validatePdfSelection } from '@/domain/pdf-limits'
+import { mergePdfFilesInBackground } from './pdf-merge-client'
 import { generatePdfPartsInBackground } from './pdf-output-client'
-import { generateZipBytesInBackground } from './zip-output-client'
+import { generateZipBlobInBackground } from './zip-output-client'
 
 export interface LoadedPdf {
   readonly bytes: Uint8Array
@@ -58,28 +59,21 @@ export const loadPdf = async (file: File): Promise<LoadedPdf> => {
   }
 }
 
-export const loadPdfFiles = async (files: readonly File[]): Promise<LoadedPdf> => {
+export const loadPdfFiles = async (
+  files: readonly File[],
+  isCancelled: () => boolean = () => false,
+): Promise<LoadedPdf> => {
   validatePdfSelection(files)
   if (files.length === 1) return loadPdf(files[0])
-
-  const { PDFDocument } = await import('pdf-lib')
-  const merged = await PDFDocument.create()
-  const sourcePageCounts: number[] = []
-  for (const file of files) {
-    await assertPdfHeader(file)
-    const source = await PDFDocument.load(await file.arrayBuffer())
-    sourcePageCounts.push(source.getPageCount())
-    const pages = await merged.copyPages(source, source.getPageIndices())
-    pages.forEach((page) => merged.addPage(page))
-  }
-
-  const bytes = new Uint8Array(await merged.save())
+  for (const file of files) await assertPdfHeader(file)
+  const merged = await mergePdfFilesInBackground(files, isCancelled)
+  const bytes = new Uint8Array(merged.buffer)
   const preview = await createPreview(bytes)
   return {
     bytes,
     preview,
     pageCount: preview.numPages,
-    sourcePageCounts,
+    sourcePageCounts: merged.sourcePageCounts,
     totalBytes: files.reduce((total, file) => total + file.size, 0),
   }
 }
@@ -88,7 +82,8 @@ export const renderThumbnail = async (pdf: PDFDocumentProxy, pageNumber: number)
   const page = await pdf.getPage(pageNumber)
   try {
     const initial = page.getViewport({ scale: 1 })
-    const viewport = page.getViewport({ scale: 720 / initial.width })
+    const devicePixelRatio = Math.min(window.devicePixelRatio || 1, 2)
+    const viewport = page.getViewport({ scale: (220 * devicePixelRatio) / initial.width })
     const canvas = document.createElement('canvas')
     const context = canvas.getContext('2d')
     if (!context) throw new Error('目前瀏覽器無法建立縮圖畫布。')
@@ -96,8 +91,10 @@ export const renderThumbnail = async (pdf: PDFDocumentProxy, pageNumber: number)
     canvas.height = Math.floor(viewport.height)
     await page.render({ canvas, canvasContext: context, viewport }).promise
     const blob = await new Promise<Blob>((resolve, reject) => {
-      canvas.toBlob((value) => value ? resolve(value) : reject(new Error('無法建立頁面縮圖。')), 'image/jpeg', 0.86)
+      canvas.toBlob((value) => value ? resolve(value) : reject(new Error('無法建立頁面縮圖。')), 'image/jpeg', 0.82)
     })
+    canvas.width = 0
+    canvas.height = 0
     return URL.createObjectURL(blob)
   } finally {
     page.cleanup()
@@ -111,9 +108,17 @@ export const splitPdf = async (
   template: string,
   onProgress: (progress: number) => void,
   isCancelled: () => boolean = () => false,
+  partIndex?: number,
 ): Promise<GeneratedFile[]> => {
   const names = createUniqueOutputNames(template, originalName, parts)
-  return generatePdfPartsInBackground({ sourceBytes, parts, names }, onProgress, isCancelled)
+  const selectedParts = partIndex === undefined ? parts : [parts[partIndex]]
+  const selectedNames = partIndex === undefined ? names : [names[partIndex]]
+  if (selectedParts.some((part) => !part) || selectedNames.some((name) => !name)) {
+    throw new Error('找不到要輸出的分件。')
+  }
+  return generatePdfPartsInBackground(
+    { sourceBytes, parts: selectedParts, names: selectedNames }, onProgress, isCancelled,
+  )
 }
 
 const downloadBlob = (blob: Blob, fileName: string): void => {
@@ -132,9 +137,9 @@ export const downloadPdf = (file: GeneratedFile): void => {
 }
 
 export const createZipBytes = (files: readonly GeneratedFile[]): Promise<Uint8Array> =>
-  generateZipBytesInBackground(files)
+  import('./zip-output-core').then(({ generateZipBytes }) => generateZipBytes(files))
 
 export const downloadZip = async (files: readonly GeneratedFile[], originalName: string): Promise<void> => {
-  const bytes = await createZipBytes(files)
-  downloadBlob(new Blob([bytes as BlobPart], { type: 'application/zip' }), `${originalName.replace(/\.pdf$/i, '')}_split.zip`)
+  const blob = await generateZipBlobInBackground(files)
+  downloadBlob(blob, `${originalName.replace(/\.pdf$/i, '')}_split.zip`)
 }

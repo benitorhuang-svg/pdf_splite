@@ -17,7 +17,7 @@
 - 使用命名模板產生輸出名稱。
 - 下載個別 PDF 或將全部結果打包成 ZIP。
 - 自動檢查空分件、重複頁面與輸出檔名衝突。
-- Service Worker 預快取、版本更新提示，可安裝並離線啟動。
+- Service Worker 預快取前端與 PDF.js worker、版本更新提示，可安裝並離線處理。
 - 響應式三欄介面與明暗模式。
 
 ## 操作流程
@@ -57,7 +57,7 @@
 - PDF.js：解析與縮圖
 - pdf-lib：頁面擷取與輸出
 - JSZip：ZIP 打包
-- Web Worker：將 PDF 拆分與 ZIP 壓縮移出 UI 主執行緒
+- Web Worker：將多檔 PDF 合併、PDF 拆分與 ZIP 壓縮移出 UI 主執行緒
 - TanStack Virtual：來源頁與分件清單虛擬化
 - vite-plugin-pwa / Workbox：PWA 與離線快取
 - Vitest / Testing Library：領域、PDF/ZIP 整合、效能基準及工作區競態測試
@@ -92,7 +92,7 @@ npm.cmd run test:e2e
 
 正式輸出位於 `dist/`。
 
-目前驗證基準為 13 個 Vitest 測試檔、40 個測試案例，以及 4 個 Chromium E2E 案例。`build` 會額外檢查 bundle 大小預算；lint 採零警告門檻，且 `src` 下的 TypeScript、TSX、CSS 均不得超過 300 行。
+目前驗證基準為 14 個 Vitest 測試檔、43 個測試案例，以及 8 個 Playwright E2E 案例；E2E 預設涵蓋 Chromium、Firefox 與 WebKit，Service Worker 離線處理情境在 Chromium 驗證。`build` 會額外檢查 bundle 大小預算；lint 採零警告門檻，且 `src` 下的 TypeScript、TSX、CSS 均不得超過 300 行。
 
 ## 專案結構
 
@@ -101,7 +101,7 @@ src/
 ├── domain/              # 拆分規則、計畫驗證、輸出唯一命名
 ├── application/         # 工作階段、匯入競態與縮圖佇列
 ├── infrastructure/      # PDF.js、pdf-lib、JSZip 與背景 Worker 介接
-├── workers/             # PDF 拆分與 ZIP 壓縮 Worker
+├── workers/             # PDF 合併、拆分與 ZIP 壓縮 Worker
 ├── components/          # 匯入、命名、頁池、分件與拖曳 UI
 ├── styles/              # 依責任拆分的樣式區段
 ├── test/                # Vitest 共用設定
@@ -125,11 +125,12 @@ React UI
      -> 獨立輸出進度 store
      -> pdf-service
         -> PDF.js Worker：解析與縮圖
-        -> PDF output Worker：pdf-lib 拆分
+         -> PDF merge Worker：多檔合併與頁數限制
+         -> PDF output Worker：pdf-lib 拆分
         -> ZIP output Worker：JSZip 壓縮
 ```
 
-正式瀏覽器使用 Worker；測試環境或不支援 Worker 的瀏覽器使用相同核心函式的 fallback，避免產生兩套行為。
+正式瀏覽器使用 Worker；測試環境或不支援 Worker 的瀏覽器使用相同核心函式的 fallback，避免產生兩套行為。縮圖會依裝置像素比產生，並限制最多 160 張 Blob URL 快取。
 
 ## 拆分規則
 
@@ -149,17 +150,17 @@ React UI
 
 ## 部署到 GitHub Pages
 
-專案包含兩個 GitHub Actions workflow：
+專案使用 GitHub Pages 作為唯一正式發布路徑，包含兩個 GitHub Actions workflow：
 
-- `.github/workflows/quality.yml`：Pull Request 執行安裝、lint、test、build、Chromium E2E。
-- `.github/workflows/deploy-pages.yml`：`main` 通過相同驗證後部署 GitHub Pages。
+- `.github/workflows/quality.yml`：Pull Request 執行安裝、lint、test、build、跨瀏覽器 E2E。
+- `.github/workflows/deploy-pages.yml`：`main` 通過相同驗證後將 `dist/` 部署至 GitHub Pages。
 
 1. 在 GitHub 建立 repository 並推送到 `main`。
 2. 開啟 repository 的 **Settings → Pages**。
 3. 將 **Source** 設成 **GitHub Actions**。
 4. 推送後等待 `Deploy PWA to GitHub Pages` 工作流程完成。
 
-Vite 使用相對 `base`，PWA manifest、Service Worker 與資源路徑可在 `https://<user>.github.io/<repo>/` 子路徑運作。
+Vite 使用相對 `base`，PWA manifest、Service Worker 與資源路徑可在 `https://<user>.github.io/<repo>/` 子路徑運作。建置只產生標準 `dist/`，不包含其他託管平台的 Worker 或 server 產物。
 
 若開發期間看到舊版 UI，可先按 `Ctrl+F5` 強制重新整理。正式 PWA 偵測到新版時會顯示更新提示；更新頁面會清除尚未下載的工作階段資料。
 
@@ -170,17 +171,17 @@ Vite 使用相對 `base`，PWA manifest、Service Worker 與資源路徑可在 `
 - 大型 PDF 的輸出運算仍可能受瀏覽器記憶體限制。
 - 單次匯入總容量上限為 200 MB，合併後總頁數上限為 2,000 頁。
 - 達 50 MB 或 500 頁時會顯示大型文件提示。
-- Web Worker 可避免 UI 長時間凍結，但瀏覽器仍需保留輸入、拆分結果及 ZIP 所需記憶體。
+- Web Worker 可避免 UI 長時間凍結，但瀏覽器仍需保留輸入、合併結果、拆分結果及 ZIP 所需記憶體；下載 ZIP 成功後會釋放暫存輸出。
 - 鍵盤移動目前以相鄰頁面或相鄰分件為單位；跨多個分件仍需重複操作。
 
 ## 瀏覽器驗證矩陣
 
 | 瀏覽器 | 自動驗證 | 備註 |
 | --- | --- | --- |
-| Chromium | Playwright E2E | PR 與部署 workflow 必跑 |
+| Chromium | Playwright E2E | PR 與部署 workflow 必跑；含離線 PDF 流程 |
+| Firefox | Playwright E2E | PR 與部署 workflow 必跑 |
+| WebKit / Safari | Playwright WebKit E2E | PR 與部署 workflow 必跑；iOS 仍需發布前手動驗證 |
 | Chrome / Edge | 手動煙霧測試 | 共用 Chromium 核心 |
-| Firefox | 待建立自動化專案 | 發布前手動驗證 |
-| Safari | 待建立自動化專案 | 發布前於 macOS／iOS 驗證 |
 
 ## 疑難排解
 

@@ -7,3 +7,10 @@ coverage/
 playwright-report/
 test-results/
 .wrangler/
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx

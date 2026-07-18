@@ -13,18 +13,40 @@ interface Options {
   readonly onError: (message: string) => void
 }
 
+const MAX_CACHED_THUMBNAILS = 160
+
 export const useThumbnailQueue = ({ loadedRef, versionRef, onError }: Options) => {
   const [thumbnails, setThumbnails] = useState<string[]>([])
   const thumbnailRef = useRef<string[]>([])
   const queue = useRef<ThumbnailJob[]>([])
   const pending = useRef(new Set<string>())
+  const usage = useRef(new Map<number, number>())
+  const usageSequence = useRef(0)
   const activeCount = useRef(0)
+
+  const touch = (page: number): void => {
+    usageSequence.current += 1
+    usage.current.set(page, usageSequence.current)
+  }
+
+  const evictOldThumbnails = (next: string[]): void => {
+    while (usage.current.size > MAX_CACHED_THUMBNAILS) {
+      const oldest = [...usage.current.entries()].sort(([, left], [, right]) => left - right)[0]
+      if (!oldest) return
+      const [page] = oldest
+      usage.current.delete(page)
+      const url = next[page - 1]
+      if (url?.startsWith('blob:')) URL.revokeObjectURL(url)
+      next[page - 1] = ''
+    }
+  }
 
   const releaseThumbnails = useCallback((): void => {
     thumbnailRef.current.forEach((url) => {
       if (url?.startsWith('blob:')) URL.revokeObjectURL(url)
     })
     thumbnailRef.current = []
+    usage.current.clear()
     setThumbnails([])
   }, [])
 
@@ -58,6 +80,8 @@ export const useThumbnailQueue = ({ loadedRef, versionRef, onError }: Options) =
             const next = [...current]
             next[job.page - 1] = url
             thumbnailRef.current = next
+            touch(job.page)
+            evictOldThumbnails(next)
             return next
           })
         }).catch((cause: unknown) => {
@@ -76,7 +100,11 @@ export const useThumbnailQueue = ({ loadedRef, versionRef, onError }: Options) =
 
   const requestThumbnail = useCallback((page: number): void => {
     const current = loadedRef.current
-    if (!current || page < 1 || page > current.pageCount || thumbnailRef.current[page - 1]) return
+    if (!current || page < 1 || page > current.pageCount) return
+    if (thumbnailRef.current[page - 1]) {
+      touch(page)
+      return
+    }
     const version = versionRef.current
     const key = `${version}:${page}`
     if (pending.current.has(key)) return
